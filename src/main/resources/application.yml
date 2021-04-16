@@ -1,0 +1,44 @@
+
+server:
+  port: 8888
+  servlet:
+    context-path: /centralized-configuration
+
+spring:
+  application:
+    name: centralized-configuration
+
+  profiles:
+    active: jdbc
+
+  datasource:
+#    hikari:
+#      max-lifetime: 900000
+#      connection-timeout: 50000
+#      pool-name: ${spring.application.name}-local-pool
+#      minimum-idle: 1
+    url: jdbc:postgresql://localhost:5432/pet-project?currentSchema=java
+    username: postgres
+    password: postgres
+
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        temp:
+          use_jdbc_metadata_defaults: false
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        generate_statistics: false
+        jdbc:
+          batch_size: 50
+    show-sql: false
+
+  cloud:
+    config:
+      server:
+        jdbc:
+          #sql: SELECT key, value FROM properties WHERE application=? AND profile=? AND label=?;
+          sql: SELECT key,value  FROM java.properties where (application =? or application = 'global') and profile =? and label = ?
+          order: 1
+        default-label: default
+        default-profile: default
